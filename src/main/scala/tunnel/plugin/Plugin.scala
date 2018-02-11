@@ -20,6 +20,7 @@ import scala.concurrent.Future
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
+import sys.process._
 
 object SbtTunnelPlugin extends AutoPlugin {
 
@@ -31,18 +32,60 @@ object SbtTunnelPlugin extends AutoPlugin {
     val tun1 = inputKey[Unit]("Says hello!")
     // val ports = inputKey[Unit]("the ports")
 
-    /**
-     * Defines "rssList" as the setting key that we want the user to fill out.
-     */
-    val rssList = settingKey[Seq[String]]("The list of RSS urls to update.")
+//    /**
+//     * Defines "rssList" as the setting key that we want the user to fill out.
+//     */
+//    val rssList = settingKey[Seq[String]]("The list of RSS urls to update.")
   }
 
   import autoImport._
 
-  override def globalSettings: Seq[Setting[_]] = super.globalSettings ++ Seq(
-    Keys.commands += rssCommand)
+  /** Allows the RSS command to take string arguments. */
+  private val args = (Space ~> StringBasic).*
 
-  var tun1a: Future[Int] = null
+  /** The tunnel command, mapped into sbt as "tunnel [args]" */
+  private lazy val tunnelCommand = Command("tunnel")(_ => args)(doTunnelCommand)
+
+  def doTunnelCommand(state: State, args: Seq[String]): State = {
+    println(s"tunnel command: $state, args: ${args.mkString(",")}")
+
+    args(0) match {
+      case "export" =>
+        TunnelConfig.export("target/tunnel-config.json")
+      case "import" =>
+        println(s"reading from ${args(1)}")
+        stcfg = TunnelConfig.importConfig(args(1)) // "src/test/resources/tunnel-config.json")
+      case "open" =>
+        openTunnel
+      case "stop" =>
+        closeTunnel
+      case "test" =>
+        testTunnel
+      case x =>
+        println(s"error: unknown ${x}")
+    }
+    state
+  }
+
+  override def globalSettings: Seq[Setting[_]] = super.globalSettings ++ Seq(
+    Keys.commands += tunnelCommand)
+
+    case class TunnelData(
+        config: SshTunnelArgs,
+        pid: Int)
+
+  var tunnels: Map[String, TunnelData] = Map()
+
+  def closeTunnel: Unit = {
+    println("close tunnel")
+    val r = s"kill $pid" !
+
+    println(s"after kill tunnel r=$r")
+  }
+
+  def testTunnel: Unit = {
+    println("test tunnel")
+  }
 
   def openTunnel = {
     val host = "54.201.39.76"
@@ -55,22 +98,23 @@ object SbtTunnelPlugin extends AutoPlugin {
       localhost = "127.0.0.1",
       key = key,
       sshport = 2222)
-    import sys.process._
     val logger = ProcessLogger(
       (o: String) => println("out " + o),
       (e: String) => println("err " + e))
     import scala.concurrent.ExecutionContext
     implicit val ec = ExecutionContext.global
-    val result = Future {
-      sta.sshcmd ! logger
-    }
-    tun1a = result
-    println(s"result = $result")
+    val t = new Thread(() => {
+      val result = sta.sshcmd ! logger
+      pid = result
+      println(s"result = $result")
+    })
+    t.start
   }
 
-  var cfg: SshTunnelConfig = null
+  var stcfg: SshTunnelConfig = null
 
-  implicit val system: ActorSystem = ActorSystem("tunnel", ConfigFactory.parseString("""
+  // implicit val system: ActorSystem = null
+/* ActorSystem("tunnel", ConfigFactory.parseString("""
 akka {
   loglevel = "INFO"
 
@@ -93,20 +137,8 @@ akka {
     }
   }
 }""")) // (greeter, "hello")
-  private implicit val mat = ActorMaterializer()
-
-  def opTunnel(args: Seq[String]) = {
-    args(0) match {
-      case "export" =>
-        TunnelConfig.export("target/tunnel-config.json")
-      case "import" =>
-        // cfg = TunnelConfig.import("src/test/resources/tunnel-config.json")
-      case "open" =>
-        openTunnel
-      case x =>
-        println(s"error: unknown ${x}")
-    }
-  }
+*/
+  // private implicit val mat = null // ActorMaterializer()
 
   override lazy val projectSettings = Seq(
     tun1 := {
@@ -114,24 +146,10 @@ akka {
       args foreach { arg =>
         println(s"arg:$arg")
       }
-      opTunnel(args)
+      // opTunnel(args)
     }
-  //    ports := {
-  //      println(s"ports here")
-  //    }
   )
 
-  /** Allows the RSS command to take string arguments. */
-  private val args = (Space ~> StringBasic).*
-
-  /** The RSS command, mapped into sbt as "rss [args]" */
-  private lazy val rssCommand = Command("rss")(_ => args)(doRssCommand)
-
-  def doRssCommand(state: State, args: Seq[String]): State = {
-    // do stuff
-    println(s"doing rss command: $state, args: ${args.mkString(",")}")
-    state
-  }
 
   // Doing Project.extract(state) and then importing it gives us currentRef.
   // Using currentRef allows us to get at the values of SettingKey.
@@ -150,7 +168,7 @@ akka {
   //  lazy val jasmineOutputDir = SettingKey[File]("jasmineOutputDir", "directory to output jasmine files to.")
   //  lazy val jasmineGenRunner = TaskKey[Unit]("jasmine-gen-runner", "Generates a jasmine test runner html page.")
 
-  println("this here")
+  // println("this here")
 
   //  def tunnelTask = (jasmineTestDir, appJsDir, appJsLibDir, jasmineConfFile, jasmineOutputDir, streams) map { (testJsRoots, appJsRoots, appJsLibRoots, confs, outDir, s) =>
   //

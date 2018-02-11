@@ -1,0 +1,14 @@
+{
+  "ports" : [
+    {
+    	  "tunnelName" : "tun2",
+      "host" : "host",
+      "serverPort" : 29002,
+      "localPort" : 29002,
+      "localhost" : "127.0.0.1",
+      "key" : "key",
+      "sshport" : 2222,
+      "sshcmdx" : ""
+    }
+  ]
+}

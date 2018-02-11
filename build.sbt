@@ -22,6 +22,11 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.0.2" % "test")
 
+val latestJson4sVersion = "3.5.3"
+val json4sNative = "org.json4s" %% "json4s-native" % latestJson4sVersion
+
+libraryDependencies += json4sNative
+
 scalacOptions in Test ++= Seq("-Yrangepos")
 
 resolvers += Resolver.sonatypeRepo("releases")
