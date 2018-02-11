@@ -31,24 +31,27 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 
 resolvers += Resolver.sonatypeRepo("releases")
 
-//libraryDependencies ++= Seq(
+libraryDependencies ++= Seq(
 //  "com.lihaoyi" %% "utest" % "0.4.4" % "test",
 //  "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
-//)
+  "ch.qos.logback" % "logback-classic" % "1.1.3",  
+  "org.slf4j" % "slf4j-api" % "1.7.25"
+  //"com.typesafe.scala-logging" %% "scala-logging-slf4j" % "3.5.0"
+)
 
 // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test"
 
-val AkkaVersion = "2.5.6"
+val AkkaVersion = "2.5.8"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
   "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
   "com.typesafe.akka" %% "akka-typed" % AkkaVersion,
-  "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.11"
+  "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.16"
 )
 
 //testFrameworks += new TestFramework("utest.runner.Framework")
