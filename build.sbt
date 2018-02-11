@@ -12,16 +12,43 @@ scalaVersion  := "2.12.3"
 
 crossScalaVersions := Seq("2.11.11", "2.12.3")
 
-resolvers += Resolver.sonatypeRepo("releases")
+val circeVersion = "0.9.1"
 
 libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
+libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.0.2" % "test")
+
+scalacOptions in Test ++= Seq("-Yrangepos")
+
+resolvers += Resolver.sonatypeRepo("releases")
+
+//libraryDependencies ++= Seq(
 //  "com.lihaoyi" %% "utest" % "0.4.4" % "test",
 //  "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
+//)
+
+// resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
+
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test"
+
+val AkkaVersion = "2.5.6"
+
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-typed" % AkkaVersion,
+  "com.lightbend.akka" %% "akka-stream-alpakka-file" % "0.11"
 )
 
 //testFrameworks += new TestFramework("utest.runner.Framework")
 
-unmanagedSourceDirectories in Test += baseDirectory(_ / "src" / "test" / "resources").value
+//unmanagedSourceDirectories in Test += baseDirectory(_ / "src" / "test" / "resources").value
 
 // Sonatype
 publishArtifact in Test := false
@@ -30,6 +57,7 @@ publishTo := version { (v: String) =>
   Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }.value
 
+/*
 pomExtra := (
   <url>https://github.com/objectnirvana/sbt-tunnel</url>
     <licenses>
@@ -50,3 +78,4 @@ pomExtra := (
       </developer>
     </developers>
   )
+*/
