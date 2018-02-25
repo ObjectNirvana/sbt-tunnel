@@ -23,6 +23,7 @@ import com.typesafe.config.ConfigFactory
 import sys.process._
 import scala.concurrent.ExecutionContext
 import java.net.ServerSocket
+import java.net.Socket
 
 object SbtTunnelPlugin extends AutoPlugin {
 
@@ -31,6 +32,7 @@ object SbtTunnelPlugin extends AutoPlugin {
    */
   object autoImport {
     val tunnel = inputKey[Unit]("Says hello!")
+    lazy val tunnelConfig = settingKey[File]("tunnel-config.json")
   }
 
   import autoImport._
@@ -50,6 +52,7 @@ object SbtTunnelPlugin extends AutoPlugin {
       case "export" =>
         TunnelConfig.export("target/tunnel-config.json")
       case "import" =>
+        println(s"tunnel config: ${tunnelConfig.key}")
         println(s"reading from ${args(1)}")
         stcfg = TunnelConfig.importConfig(args(1)) // "src/test/resources/tunnel-config.json")
       case "open" =>
@@ -92,9 +95,10 @@ object SbtTunnelPlugin extends AutoPlugin {
   def testTunnel(name: String): Unit = {
     println("test tunnel")
     val sta = stcfg.ports.filter(_.tunnelName == name).head
-    var s: ServerSocket = null
+    var s: Socket = null
     try {
-      s = new ServerSocket(sta.localPort)
+      // s = new ServerSocket(sta.localPort)
+      s = new Socket("127.0.0.1", sta.localPort)
       println("port open")
     } catch {
       case t: Throwable =>
@@ -106,6 +110,7 @@ object SbtTunnelPlugin extends AutoPlugin {
   }
 
   def openTunnel(name: String) = {
+    println(s"opening tunnel: $name")
 //    val host = "54.201.39.76"
 //    val key = "~/.ssh/gvsupport_key"
 //    // val sshcmd = s"""ssh -v -i ${key} -p $sshport root@${host} -L $serverPort:${localhost}:$localPort -N"""
@@ -125,7 +130,7 @@ object SbtTunnelPlugin extends AutoPlugin {
     val t = new Thread(() => {
       val result = sta.sshcmd ! logger
       updatePid(sta.tunnelName, result)
-      println(s"setting pit = $result for $name")
+      println(s"setting pid = $result for $name")
     })
     tunnels = tunnels.updated(sta.tunnelName, TunnelData(thread = t, config = sta))
     t.start

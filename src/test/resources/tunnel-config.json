@@ -3,12 +3,20 @@
     {
     	  "tunnelName" : "tun2",
       "host" : "host",
+      "user" : "root",
       "serverPort" : 29002,
       "localPort" : 29002,
       "localhost" : "127.0.0.1",
       "key" : "key",
       "sshport" : 2222,
       "sshcmdx" : ""
+    },
+    {
+    	  "tunnelName" : "mongo-at-oni",
+      "host" : "objectnirvana.com",
+      "serverPort" : 27017,
+      "localPort" : 27017,
+      "localhost" : "127.0.0.1"
     }
   ]
 }

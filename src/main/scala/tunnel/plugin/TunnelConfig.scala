@@ -75,11 +75,12 @@ object TunnelConfig {
     val sta = SshTunnelArgs(
         tunnelName = "tun2",
         host = "host",
+        user = Some("root"),
         serverPort = 29002,
         localPort = 29002,
         localhost = "127.0.0.1",
-        key= "key",
-        sshport = 2222)
+        key= Some("key"),
+        sshport = Some(2222))
     val stc = SshTunnelConfig(List(sta))
     // val json = stc.asJson
     val json = write(stc)
@@ -97,6 +98,7 @@ object TunnelConfig {
     val json: String = IO.read(new File(name))
     val cfg = read[SshTunnelConfig](json)
     validate(cfg)
+    println(s"loaded: $cfg")
     cfg
 //    decode[SshTunnelConfig](json) match {
 //      case Right(stc) =>
