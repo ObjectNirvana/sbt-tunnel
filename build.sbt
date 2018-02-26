@@ -2,15 +2,15 @@ sbtPlugin       := true
 
 sbtVersion := "1.1.0"
 
-organization  := "com.oni"
+organization  := "com.objectnirvana.sbt"
 
 name := "sbt-tunnel"
 
 version := "0.1.0-SNAPSHOT"
 
-scalaVersion  := "2.12.3"
+scalaVersion  := "2.12.4"
 
-crossScalaVersions := Seq("2.11.11", "2.12.3")
+crossScalaVersions := Seq("2.11.11", "2.12.4")
 
 val circeVersion = "0.9.1"
 
@@ -32,14 +32,11 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 resolvers += Resolver.sonatypeRepo("releases")
 
 libraryDependencies ++= Seq(
-//  "com.lihaoyi" %% "utest" % "0.4.4" % "test",
 //  "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
   "ch.qos.logback" % "logback-classic" % "1.1.3",  
   "org.slf4j" % "slf4j-api" % "1.7.25"
   //"com.typesafe.scala-logging" %% "scala-logging-slf4j" % "3.5.0"
 )
-
-// resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test"
@@ -65,9 +62,8 @@ publishTo := version { (v: String) =>
   Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }.value
 
-/*
 pomExtra := (
-  <url>https://github.com/objectnirvana/sbt-tunnel</url>
+  <url>https://github.com/ObjectNirvana/sbt-tunnel</url>
     <licenses>
       <license>
         <name>MIT license</name>
@@ -75,8 +71,8 @@ pomExtra := (
       </license>
     </licenses>
     <scm>
-      <url>git://github.com/objectnirvana/sbt-tunnel.git</url>
-      <connection>scm:git://github.com/objectnirvana/sbt-tunnel.git</connection>
+      <url>git://github.com/ObjectNirvana/sbt-tunnel.git</url>
+      <connection>scm:git://github.com/ObjectNirvana/sbt-tunnel.git</connection>
     </scm>
     <developers>
       <developer>
@@ -86,4 +82,3 @@ pomExtra := (
       </developer>
     </developers>
   )
-*/
