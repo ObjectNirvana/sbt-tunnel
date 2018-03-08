@@ -1,14 +1,32 @@
 sbtPlugin       := true
 
-sbtVersion := "1.1.0"
+sbtVersion := "1.1.1"
 
 organization  := "com.objectnirvana.sbt"
 
 name := "sbt-tunnel"
 
-version := "0.1.0-SNAPSHOT"
+useGpg := true
+
+pgpReadOnly := true
+
+// gpgCommand := "/usr/local/bin/gpg"
+
+// pgpSecretRing := file("/path/to/my/secring.gpg")
 
 scalaVersion  := "2.12.4"
+
+// POM settings for Sonatype
+homepage := Some(url("https://github.com/ObjectNirvana/sbt-tunnel"))
+scmInfo := Some(ScmInfo(url("https://github.com/ObjectNirvana/sbt-tunnel"),
+                            "git@github.com:ObjectNirvana/sbt-tunnel.git"))
+developers := List(Developer("username",
+                             "Michael McCray",
+                             "mike@objectnirvana.com",
+                             url("https://github.com/ObjectNirvana")))
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+publishMavenStyle := true
+
 
 crossScalaVersions := Seq("2.11.11", "2.12.4")
 
@@ -58,9 +76,17 @@ libraryDependencies ++= Seq(
 // Sonatype
 publishArtifact in Test := false
 
-publishTo := version { (v: String) =>
-  Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-}.value
+//publishTo := version { (v: String) =>
+//  Some("releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+//}.value
+
+// Add sonatype repository settings
+publishTo := Some(
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeSnapshots
+  else
+    Opts.resolver.sonatypeStaging
+)
 
 pomExtra := (
   <url>https://github.com/ObjectNirvana/sbt-tunnel</url>
